@@ -1,7 +1,7 @@
 Source: libsoc
 Priority: extra
 Maintainer: Vagrant Cascadian <vagrant@debian.org>
-Build-Depends: debhelper (>= 9), dh-autoreconf
+Build-Depends: debhelper (>= 9), dh-autoreconf, python-dev
 Standards-Version: 3.9.5
 Section: libs
 Homepage: https://github.com/jackmitch/libsoc
@@ -11,7 +11,7 @@ Homepage: https://github.com/jackmitch/libsoc
 Package: libsoc-dev
 Section: libdevel
 Architecture: any
-Depends: libsoc2 (= ${binary:Version}), ${misc:Depends}
+Depends: libsoc2 (= ${binary:Version}), ${misc:Depends}, python
 Description: Development files for common System On Chip peripherals Library
  libsoc is a C library to interface with common peripherals found in
  System on Chips through generic Linux Kernel interfaces.
@@ -32,6 +32,23 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Runtime libraries for common System On Chip peripherals Library
  libsoc is a C library to interface with common peripherals found in
  System on Chips through generic Linux Kernel interfaces.
+ .
+ It is aimed at new Linux users, and intends to be a stepping stone to
+ enable a user to get started quickly. It is optimised for reliability
+ rather than speed. While the library should be fast, no guarantees are
+ made on it's determinism and it should not be used in time critical
+ routines.
+ .
+ This package includes the runtime libraries.
+
+Package: python-libsoc2
+Section: python
+Architecture: any
+Pre-Depends: multiarch-support
+Depends: ${shlibs:Depends}, ${misc:Depends}, python, libsoc2
+Description: Python libraries for common System On Chip peripherals Library
+ python-libsoc is a Python library to interface with common peripherals found
+ in System on Chips through generic Linux Kernel interfaces.
  .
  It is aimed at new Linux users, and intends to be a stepping stone to
  enable a user to get started quickly. It is optimised for reliability
