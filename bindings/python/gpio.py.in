@@ -11,7 +11,7 @@ from _libsoc import (
 
 
 class GPIO(object):
-    _lib = ctypes.CDLL('@prefix@/lib/libsoc.so')
+    _lib = ctypes.CDLL('libsoc.so.2')
     _board_config = None
 
     def __init__(self, id, direction, edge=EDGE_NONE, mode=LS_SHARED,
