@@ -1,3 +1,83 @@
+libsoc (0.6.5-python-1) stable; urgency=medium
+
+  [ Jack Mitchell ]
+  * pwm: fix unclosed file descriptors on free
+  * specify that pwm subsystem is only support from 3.12 onwards
+  * document change to debug-code default
+  * README: fix errors
+
+  [ Yegor Yefremov ]
+  * gpio: remove check for MAX_GPIO_ID
+  * Fix C++ support
+  * headers: add include guards
+  * gpio: workaround for immediate return from poll
+  * gpio: add support for 'both' edge mode
+
+  [ Jack Mitchell ]
+  * 0.6.1
+
+  [ Yegor Yefremov ]
+  * gpio: move pthread header inclusion to libsoc_gpio.h
+  * pwm: remove unused variable
+  * spi: fix brackets
+  * gpio: fix memory leak
+  * i2c: move stdint header to include file
+
+  [ Jack Mitchell ]
+  * TODO: add some new items
+  * 0.6.2
+
+  [ Yegor Yefremov ]
+  * spi: move stdint header to include file
+  * gpio: set callback pointer to NULL by default
+  * style: remove unnecessary break statements
+  * style: reduce variable scope
+
+  [ Jack Mitchell ]
+  * 0.6.3
+
+  [ Yegor Yefremov ]
+  * Add pkg-config support
+  * gitignore: add libsoc.pc
+  * Enable silent build
+  * Fix autoreconf warnings
+
+  [ Jack Mitchell ]
+  * news: use same date format, and fix incorrect dates
+  * 0.6.4
+  * gpio: fix interrupt poll to seek before read
+  * 0.6.5
+
+  [ Yegor Yefremov ]
+  * autoconf: fix syntax error
+
+  [ Andy Doan ]
+  * Add optional "board" support mechanism
+  * contrib: Add ability to install board-specific gpio.conf
+  * debug: Add a new libsoc_warn function
+  * gpio: Add optional board-specific helper
+  * Update README with new --enable-board information.
+
+  [ Nicolas Dechesne ]
+  * board_files: rename dragonboard to dragonboard410c
+
+  [ Andy Doan ]
+  * Add optional python wrapper to gpio APIs
+  * python: add libsoc_gpio_callback_interrupt support
+
+  [ Jason Abele ]
+  * python: fix python Makefile paths
+
+  [ Andrew Langley ]
+  * board_files: Adding CHIP board files
+
+  [ Jason Abele ]
+  * python: hacky fix of lib path and version
+  * debian: add python dependency
+  * debian: build in board config for CHIP
+
+ -- Jason Abele <jason@nextthing.co>  Mon, 14 Dec 2015 14:22:32 -0800
+
 libsoc (0.6-1~20140213~1) wheezy-bbb; urgency=low
 
   * Initial upload to BeagleBone Black repository.
