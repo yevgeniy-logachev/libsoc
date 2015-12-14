@@ -64,7 +64,6 @@ pwm* libsoc_pwm_request (unsigned int chip, unsigned int pwm_num,
 	    case LS_WEAK:
 	    {
 	      return NULL;
-	      break;
 	    }
 
     	case LS_SHARED:
@@ -139,7 +138,19 @@ int libsoc_pwm_free(pwm *pwm)
   libsoc_pwm_debug(__func__, pwm->chip, pwm->pwm, "freeing pwm");
 
   if (file_close(pwm->enable_fd) < 0)
+  {
     return EXIT_FAILURE;
+  }
+
+  if (file_close(pwm->period_fd) < 0)
+  {
+    return EXIT_FAILURE;
+  }
+
+  if (file_close(pwm->duty_fd) < 0)
+  {
+    return EXIT_FAILURE;
+  }
 
   if (pwm->shared == 1)
   {
@@ -222,8 +233,6 @@ pwm_enabled libsoc_pwm_get_enabled(pwm *pwm)
 
 int libsoc_pwm_set_period(pwm *pwm, unsigned int period)
 {
-  int fd;
-
   if (pwm == NULL)
   {
     libsoc_pwm_debug(__func__, -1, -1, "invalid pwm pointer");

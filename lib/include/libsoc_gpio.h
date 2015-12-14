@@ -1,3 +1,12 @@
+#ifndef _LIBSOC_GPIO_H_
+#define _LIBSOC_GPIO_H_
+
+#include <pthread.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \struct gpio_callback
  * \brief representation of an interrupt callback
@@ -57,7 +66,7 @@ typedef enum {
 
 /**
  * \enum gpio_edge
- * \brief defined values for rising/falling/none gpio edge
+ * \brief defined values for rising/falling/none/both gpio edge
  */
 
 typedef enum {
@@ -65,6 +74,7 @@ typedef enum {
 	RISING = 0,
 	FALLING = 1,
 	NONE = 2,
+	BOTH = 3,
 } gpio_edge;
 
 /**
@@ -210,3 +220,8 @@ int libsoc_gpio_callback_interrupt(gpio * gpio, int (*callback_fn) (void *),
  */
 
 int libsoc_gpio_callback_interrupt_cancel(gpio * gpio);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

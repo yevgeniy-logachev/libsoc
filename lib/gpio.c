@@ -4,7 +4,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <poll.h>
-#include <pthread.h>
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
@@ -14,11 +13,10 @@
 #include "libsoc_gpio.h"
 
 #define STR_BUF 256
-#define MAX_GPIO_ID 255
 
 const char gpio_level_strings[2][STR_BUF] = { "0", "1" };
 const char gpio_direction_strings[2][STR_BUF] = { "in", "out" };
-const char gpio_edge_strings[3][STR_BUF] = { "rising", "falling", "none" };
+const char gpio_edge_strings[4][STR_BUF] = { "rising", "falling", "none", "both" };
 
 inline void
 libsoc_gpio_debug (const char *func, int gpio, char *format, ...)
@@ -53,7 +51,6 @@ gpio *
 libsoc_gpio_request (unsigned int gpio_id, enum gpio_mode mode)
 {
   gpio *new_gpio;
-  int fd;
   char tmp_str[STR_BUF];
   int shared = 0;
 
@@ -67,12 +64,6 @@ libsoc_gpio_request (unsigned int gpio_id, enum gpio_mode mode)
 
   libsoc_gpio_debug (__func__, gpio_id, "requested gpio");
 
-  if (gpio_id > MAX_GPIO_ID)
-    {
-      libsoc_gpio_debug (__func__, gpio_id, "gpio out of range (0-255)");
-      return NULL;
-    }
-
   sprintf (tmp_str, "/sys/class/gpio/gpio%d/value", gpio_id);
 
   if (file_valid (tmp_str))
@@ -84,7 +75,6 @@ libsoc_gpio_request (unsigned int gpio_id, enum gpio_mode mode)
 	case LS_WEAK:
 	  {
 	    return NULL;
-	    break;
 	  }
 
 	case LS_SHARED:
@@ -101,7 +91,7 @@ libsoc_gpio_request (unsigned int gpio_id, enum gpio_mode mode)
     }
   else
     {
-      fd = file_open ("/sys/class/gpio/export", O_SYNC | O_WRONLY);
+      int fd = file_open ("/sys/class/gpio/export", O_SYNC | O_WRONLY);
 
       if (fd < 0)
 	return NULL;
@@ -126,16 +116,22 @@ libsoc_gpio_request (unsigned int gpio_id, enum gpio_mode mode)
     }
 
   new_gpio = malloc (sizeof (gpio));
+  if (new_gpio == NULL)
+    return NULL;
 
   sprintf (tmp_str, "/sys/class/gpio/gpio%d/value", gpio_id);
 
   new_gpio->value_fd = file_open (tmp_str, O_SYNC | O_RDWR);
 
   if (new_gpio->value_fd < 0)
-    return NULL;
+    {
+      free(new_gpio);
+      return NULL;
+    }
 
   new_gpio->gpio = gpio_id;
   new_gpio->shared = shared;
+  new_gpio->callback = NULL;
 
   return new_gpio;
 }
@@ -388,6 +384,12 @@ libsoc_gpio_get_edge (gpio * current_gpio)
 			 "read edge as falling");
       return FALLING;
     }
+  else if (strncmp (tmp_str, "b", 1) == 0)
+    {
+      libsoc_gpio_debug (__func__, current_gpio->gpio,
+			 "read edge as both");
+      return BOTH;
+    }
   else
     {
       libsoc_gpio_debug (__func__, current_gpio->gpio, "read edge as none");
@@ -415,15 +417,20 @@ libsoc_gpio_wait_interrupt (gpio * gpio, int timeout)
   if (test_edge == EDGE_ERROR || test_edge == NONE)
     {
       libsoc_gpio_debug (__func__, gpio->gpio,
-			 "edge must be FALLING or RISING");
+			 "edge must be FALLING, RISING or BOTH");
       return EXIT_FAILURE;
     }
 
   struct pollfd pfd[1];
+  char buffer[1];
 
   pfd[0].fd = gpio->value_fd;
   pfd[0].events = POLLPRI;
   pfd[0].revents = 0;
+
+  // Read data for clean initial poll
+  lseek (pfd[0].fd, 0, SEEK_SET);
+  read (pfd[0].fd, buffer, 1);
 
   int ready = poll (pfd, 1, timeout);
 
@@ -462,7 +469,6 @@ __libsoc_new_interrupt_callback_thread (void *void_gpio)
   pfd[0].revents = 0;
 
   char buffer[1];
-  int ready;
 
   // Read data for clean initial poll
   read (pfd[0].fd, buffer, 1);
@@ -475,7 +481,7 @@ __libsoc_new_interrupt_callback_thread (void *void_gpio)
 
   while (1)
     {
-      ready = poll (pfd, 1, -1);
+      int ready = poll (pfd, 1, -1);
 
       switch (ready)
 	{

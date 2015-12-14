@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -302,9 +301,11 @@ libsoc_spi_read (spi * spi, uint8_t * rx, uint32_t len)
       return EXIT_FAILURE;
     }
 
-  if (len <= 0)
-    libsoc_spi_debug (__func__, spi, "length was less than zero");
-  return EXIT_FAILURE;
+  if (len <= 0) 
+    {
+      libsoc_spi_debug (__func__, spi, "length was less than zero");
+      return EXIT_FAILURE;
+    }
 
   int ret;
 
