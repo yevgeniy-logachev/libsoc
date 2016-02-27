@@ -4,7 +4,8 @@ include_HEADERS = include/libsoc_gpio.h \
                   include/libsoc_i2c.h \
                   include/libsoc_pwm.h \
                   include/libsoc_board.h \
-                  include/libsoc_debug.h
+                  include/libsoc_debug.h \
+                  include/libsoc_fast_gpio.h
 
 libsoc_la_SOURCES = gpio.c \
 										spi.c \
@@ -12,7 +13,8 @@ libsoc_la_SOURCES = gpio.c \
 										i2c.c \
 										pwm.c \
 										board.c \
-										debug.c
+										debug.c \
+										fast_gpio.c
 
 libsoc_la_CPPFLAGS = -I${top_srcdir}/lib/include
 
