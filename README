@@ -28,6 +28,7 @@ What peripherals does it support?
 Current Support:
 
 - Manual GPIO Manipulation through sysfs (Value, Edge, Direction, Exporting)
+- Manual GPIO Manipulation through memmap (Value, Direction)
 - Blocking GPIO Interrupts with timeout
 - Non-blocking GPIO Interrupts with callback mechanism (pthread based)
 - SPI transfers using spidev
