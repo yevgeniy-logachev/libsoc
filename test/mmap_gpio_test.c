@@ -3,33 +3,33 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "libsoc_fast_gpio.h"
+#include "libsoc_mmap_gpio.h"
 
 int main()
 {
 	int ret = -1;
 
-	ret = libsoc_fast_gpio_init();
+	ret = libsoc_mmap_gpio_init();
 	if (ret != 0)
 	{
 		printf("Fail to init GPIO memory map");
 		goto fail;
 	}
 
-	fast_gpio *gpio_output = libsoc_fast_gpio_request('E', 4);
+	mmap_gpio *gpio_output = libsoc_mmap_gpio_request('E', 4);
 	if (gpio_output == NULL)
 	{
 		printf("Faile to open GPIO\n");
 		goto fail;
 	}
 
-	libsoc_fast_gpio_set_direction(gpio_output, OUTPUT);
+	libsoc_mmap_gpio_set_direction(gpio_output, OUTPUT);
 	int  i;
 	for (i = 0; i < 1000; ++i)
 	{
-		libsoc_fast_gpio_set_level(gpio_output, HIGH);
+		libsoc_mmap_gpio_set_level(gpio_output, HIGH);
 		sleep(3);
-		libsoc_fast_gpio_set_level(gpio_output, LOW);
+		libsoc_mmap_gpio_set_level(gpio_output, LOW);
 		sleep(3);
 	}
 
@@ -38,9 +38,9 @@ int main()
 	fail:
 	if (gpio_output)
 	{
-		libsoc_fast_gpio_free(gpio_output);
+		libsoc_mmap_gpio_free(gpio_output);
 	}
-	libsoc_fast_gpio_shutdown();
+	libsoc_mmap_gpio_shutdown();
 
 	return ret;
 }
