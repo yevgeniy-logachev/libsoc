@@ -152,7 +152,7 @@ int libsoc_mmap_gpio_init()
 	}
 
 	gpio_mem = mmap(NULL, (0x800 + pagesize - 1) & ~(pagesize - 1), PROT_WRITE | PROT_READ, MAP_SHARED, fd, addr);
-	if (!gpio_mem) 
+	if (gpio_mem == MAP_FAILED) 
 	{
 		printf("Failed to map GPIO");
 		goto clean;
