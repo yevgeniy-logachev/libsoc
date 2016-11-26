@@ -24,12 +24,10 @@ lib/libsoc_la-gpio.lo
 lib/libsoc_la-gpio.o
 ltmain.sh
 missing
-test/gpio_test
-test/spi_test
-test/i2c_test
-test/pwm_test
+test/*_test
 libtool
 libsoc.pc
 *.lo
 *.o
 *.swp
+*~
