@@ -44,9 +44,13 @@ libsoc_board_init()
     {
       while(fgets(line, sizeof(line), fp))
         {
-          if (*line == '#' || *line == '\0' || *line == '\n') continue;
+	  // Skip leading blanks
+	  char *p = line;
+	  while (isspace(*p)) p++;
+	  // Skip empty lines and comments
+          if (*p == '#' || *p == '\0') continue;
           ptr = calloc(sizeof(pin_mapping), 1);
-          rc = sscanf(line, "%15[^=]=%d", ptr->pin, &ptr->gpio);
+          rc = sscanf(p, "%15[^=]=%d", ptr->pin, &ptr->gpio);
           if (rc != 2)
             {
               libsoc_warn("Invalid mapping line in %s:\n%s\n", conf, line);
@@ -89,7 +93,7 @@ libsoc_board_free(board_config *config)
     }
 }
 
-unsigned int
+int
 libsoc_board_gpio_id(board_config *config, const char* pin)
 {
   pin_mapping *ptr = NULL;

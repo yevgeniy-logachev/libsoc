@@ -30,7 +30,7 @@ all:
 	@echo "Use one of the following targets: $(TARGETS)"
 
 test-%: %_test force
-	sudo ./$*_test
+	-sudo ./$*_test $(ARGS)
 
 %_test: %_test.c
 	$(CC) $(CFLAGS) -o $@ $*_test.c -lsoc

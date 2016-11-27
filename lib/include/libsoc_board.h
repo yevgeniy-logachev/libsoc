@@ -54,7 +54,7 @@ void libsoc_board_free(board_config *config);
  * \return >=0 for gpio id or -1 on failure
  */
 
-unsigned int libsoc_board_gpio_id(board_config *config, const char* pin);
+int libsoc_board_gpio_id(board_config *config, const char* pin);
 
 #ifdef __cplusplus
 }
