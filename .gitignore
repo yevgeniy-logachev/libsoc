@@ -21,10 +21,7 @@ install-sh
 *Makefile.in
 ltmain.sh
 missing
-test/gpio_test
-test/spi_test
-test/i2c_test
-test/pwm_test
+test/*_test
 libtool
 libsoc.pc
 *.la
@@ -32,3 +29,4 @@ libsoc.pc
 *.o
 *.pyc
 *.swp
+*~

@@ -46,7 +46,7 @@ AS_IF([test "x$python_arg" != xno], [
 		AC_MSG_ERROR([Python interpreter $PYTHON does not exist])
 	fi
 
-	PKG_CHECK_MODULES([PYTHON], [python-"$PYTHON_VERSION"])
+	#PKG_CHECK_MODULES([PYTHON], [python-"$PYTHON_VERSION"])
 ])
 
 AM_CONDITIONAL([HAVE_PYTHON], [test "x$PYTHON" != x])
