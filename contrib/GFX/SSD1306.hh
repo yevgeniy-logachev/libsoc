@@ -29,7 +29,7 @@ All text above, and the splash screen must be included in any redistribution
 
 #include "rgbDriver.hh"
 #include "gpio.hh"
-//#include "spi.hpp"
+#include "spi.hh"
 
 namespace libSOC {
 
@@ -40,7 +40,7 @@ namespace libSOC {
 
     SSD1306(gpio* sclk, gpio* din, gpio* dc, gpio* cs, gpio* rst, unsigned char height = 32);
 
-    SSD1306(unsigned char spiNum, unsigned char csNum, gpio* dc, gpio* rst, unsigned char height = 32);
+    SSD1306(spi* spiDev, gpio* dc, gpio* rst, unsigned char height = 32);
 
     void begin();
   
@@ -70,7 +70,7 @@ namespace libSOC {
 
   private:
     unsigned char m_height;
-    void*  m_spi;
+    spi*  m_spi;
     gpio* m_din;
     gpio* m_sclk;
     gpio* m_dc;

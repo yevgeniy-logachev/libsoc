@@ -29,7 +29,7 @@ OBJS	= $(patsubst %.cc,%.o,$(SRCS))
 all: libsocGFX.a
 
 test: libsocGFX.a
-	$(CC) $(CFLAGS) -o test -DTEST SSD1306.cc libsocGFX.a \
+	$(CC) $(CFLAGS) -o test -DTEST gfx.cc libsocGFX.a \
 		$(INSTALLDIR)/lib/libsoc++.a $(INSTALLDIR)/lib/libsoc.a -lstdc++ -l pthread
 
 libsocGFX.a: $(OBJS)

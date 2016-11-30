@@ -192,9 +192,9 @@ SSD1306::SSD1306(gpio* sclk, gpio* din, gpio* dc, gpio* cs, gpio* rst, unsigned 
   if (m_rst != NULL) m_rst->makeOutput();
 }
 
-/*
-SSD1306::SSD1306(unsigned char spiNum, unsigned char csNum, gpio* dc, gpio* rst, unsigned char height)
-  : m_spi(spi::get(spiNum, csNum)), m_din(NULL), m_sclk(NULL), m_dc(dc),
+
+SSD1306::SSD1306(spi *spiDev, gpio* dc, gpio* rst, unsigned char height)
+  : m_spi(spiDev), m_din(NULL), m_sclk(NULL), m_dc(dc),
     m_rst(rst), m_cs(NULL), m_height(height)
 {
   if (height != 32 && height != 64) {
@@ -212,11 +212,10 @@ SSD1306::SSD1306(unsigned char spiNum, unsigned char csNum, gpio* dc, gpio* rst,
     fprintf(stderr, "ERROR: No GPIO pin specified for SSD1306::d/c.\n");
     exit(1);
   }
-  m_dc->configure(pin::OUT);
+  m_dc->makeOutput();
 
-  if (m_rst != NULL) m_rst->configure(pin::OUT);
+  if (m_rst != NULL) m_rst->makeOutput();
 }
-*/
 
 
 /** Reset the display */
@@ -228,7 +227,6 @@ SSD1306::reset(void)
   if (m_rst == NULL) return;
   // toggle RST low to reset
   m_rst->setValue(0);
-  usleep(500000);
   m_rst->setValue(1);
 }
 
@@ -408,7 +406,7 @@ inline void
 SSD1306::SPIwrite(uint8_t d)
 {
   if (m_spi != NULL) {
-    //m_spi->send(1, (const char*) &d);
+    m_spi->send(1, (const char*) &d);
     return;
   }
 
@@ -432,15 +430,17 @@ main(int argc, const char* argv[])
   
   //#define SPI
 #ifdef SPI
-  libSOC::SSD1306 drv(1, 0, // SPI
-			  libSOC::gpio::P8(42),  // D/C
-			  libSOC::gpio::P8(40)); // RST
+  libSOC::SSD1306 drv(libSOC::spi::get(32766, 0), // SPI
+		      libSOC::gpio::get("CSID1"),  // D/C
+		      libSOC::gpio::get("CSID0"),  // RST
+		      64);
 #else
   libSOC::SSD1306 drv(libSOC::gpio::get("CSID4"),     // CLK
 		      libSOC::gpio::get("CSID6"),  // DIN
 		      libSOC::gpio::get("CSID1"),     // D/C
 		      libSOC::gpio::get("CSID2"),    // CS
-		      libSOC::gpio::get("CSID0"), 64);    // RST
+		      libSOC::gpio::get("CSID0"),    // RST
+		      64);
 #endif
 
   int X = drv.getWidth();

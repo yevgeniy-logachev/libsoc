@@ -19,8 +19,8 @@ extern "C" {
 
 typedef struct {
   int fd;
-  uint8_t spi_dev;
-  uint8_t chip_select;
+  uint32_t spi_dev;
+  uint32_t chip_select;
 } spi;
 
 /**
@@ -49,11 +49,11 @@ typedef enum {
  * \fn spi* libsoc_spi_init (uint8_t spidev_device, uint8_t chip_select)
  * \brief opens the spidev character device and intitialises a new spi
  *  struct
- * \param uint8_t spidev_device - the major spidev number
- * \param uint8_t spidev_device - the minor spidev number
+ * \param uint32_t spidev_device - the major spidev number
+ * \param uint32_t spidev_device - the minor spidev number
  * \return spi* struct pointer or NULL on failure
  */
-spi* libsoc_spi_init (uint8_t spidev_device, uint8_t chip_select);
+spi* libsoc_spi_init (uint32_t spidev_device, uint32_t chip_select);
 
 /**
  * \fn int libsoc_spi_free(spi* spi)

@@ -639,11 +639,12 @@ gfx::drawChar(uint8_t c,
 int
 main(int argc, const char* argv[])
 {
-  libSOC::SSD1306 drv(libSOC::gpio::get("CSICK"),     // CLK
-		      libSOC::gpio::get("CSIHSYNC"),  // DIN
+  libSOC::SSD1306 drv(libSOC::gpio::get("CSID4"),     // CLK
+		      libSOC::gpio::get("CSID6"),  // DIN
 		      libSOC::gpio::get("CSID1"),     // D/C
-		      libSOC::gpio::get("CSIPCK"),    // CS
-		      libSOC::gpio::get("CSID0"));    // RST
+		      libSOC::gpio::get("CSID2"),    // CS
+		      libSOC::gpio::get("CSID0"),
+                      64);    // RST
 
   printf("Starting Test...\n");
 

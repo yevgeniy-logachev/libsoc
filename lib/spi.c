@@ -44,7 +44,7 @@ libsoc_spi_debug (const char *func, spi * spi, char *format, ...)
 }
 
 spi *
-libsoc_spi_init (uint8_t spidev_device, uint8_t chip_select)
+libsoc_spi_init (uint32_t spidev_device, uint32_t chip_select)
 {
   spi *spi_dev;
 
@@ -276,7 +276,11 @@ libsoc_spi_write (spi * spi, uint8_t * tx, uint32_t len)
 
   struct spi_ioc_transfer tr = {
     .tx_buf = (unsigned long) tx,
+    .rx_buf = 0,
     .len = len,
+    .delay_usecs = 0,
+    .speed_hz = 1000,
+    .bits_per_word = 8,
   };
 
   ret = ioctl (spi->fd, SPI_IOC_MESSAGE (1), &tr);
