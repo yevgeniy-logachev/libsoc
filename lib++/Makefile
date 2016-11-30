@@ -20,27 +20,30 @@
 INSTALLDIR = /usr/local
 
 CC	= gcc
-CFLAGS	= -I$(INSTALLDIR)/include
+CFLAGS	= -Iinclude -I ../lib/include
 
-EXS	= $(wildcard *_ex.c *_ex.cc)
-TARGETS = $(patsubst %_ex.c,run-%,$(patsubst %_ex.cc,run-%,$(EXS)))
-A_EX    = $(word 1,$(TARGETS))
+SRCS	= $(wildcard *.cc)
+OBJS	= $(patsubst %.cc,%.o,$(SRCS))
 
-ARGS	?= -h
 
-all:
-	@echo "Use one of the following targets: $(TARGETS)"
-	@echo "Specify run-time arguments via the ARGS variable"
-	@echo "e.g. make ARGS=<...> $(A_EX)"
+all: libsoc++.a
 
-run-%: %_ex FORCE
-	-sudo ./$*_ex $(ARGS)
 
-%_ex: %_ex.c
-	$(CC) $(CFLAGS) -o $@ $*_ex.c $(INSTALLDIR)/lib/libsoc.a -lpthread
+install: all | $(INSTALLDIR)/include/libsoc
+	cp include/*.hh $(INSTALLDIR)/include/libsoc
+	cp libsoc++.a $(INSTALLDIR)/lib
 
-%_ex: %_ex.cc
-	$(CC) $(CFLAGS) -o $@ $*_ex.cc $(INSTALLDIR)/lib/libsoc++.a $(INSTALLDIR)/lib/libsoc.a -lstdc++ -lpthread
+
+$(INSTALLDIR)/include/libsoc:
+	mkdir -p  $(INSTALLDIR)/include/libsoc
+
+
+libsoc++.a: $(OBJS)
+	ar cr $@ $(OBJS)
+	ranlib $@
+
+%.o: %.cc
+	$(CC) -c $(CFLAGS) $*.cc
 
 FORCE:
 

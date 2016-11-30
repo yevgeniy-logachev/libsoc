@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2015 Janick Bergeron
+ * Copyright (c) 2012-2016 Janick Bergeron
  * All Rights Reserved
  * 
  *   Licensed under the Apache License, Version 2.0 (the
@@ -22,9 +22,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "libsoc_board.h"
-#include "libsoc_gpio.h"
-#include "libsoc_debug.h"
+#include "libsoc/gpio.hh"
+#include "libsoc/debug.hh"
 
 
 void usage(const char* cmd)
@@ -40,13 +39,7 @@ void usage(const char* cmd)
 int
 main(int argc, char *argv[])
 {
-  board_config *board = libsoc_board_init();
-  if (board == NULL) {
-    fprintf(stderr, "ERROR: Cannot initialize board pin database.\n");
-    exit(-1);
-  }
-  
-  gpio *gpioLED = NULL;
+  libSOC::gpio *gpioLED = NULL;
 
   signed char optchar;
   
@@ -54,7 +47,7 @@ main(int argc, char *argv[])
     switch (optchar) {
 
     case 'd':
-      libsoc_set_debug(1);
+      libSOC::debug::set_level(1);
       break;
 
     case 'i':
@@ -63,7 +56,7 @@ main(int argc, char *argv[])
 	usage(argv[0]);
 	return -1;
       }
-      gpioLED = libsoc_gpio_request(atoi(optarg), LS_SHARED);
+      gpioLED = libSOC::gpio::get(atoi(optarg));
       if (gpioLED == NULL) {
 	fprintf(stderr, "ERROR: Unable to get pin #%d.\n", atoi(optarg));
 	return -1;
@@ -76,17 +69,10 @@ main(int argc, char *argv[])
 	usage(argv[0]);
 	return -1;
       }
-      {
-	int pin = libsoc_board_gpio_id(board, optarg);
-	if (pin < 0) {
-	  fprintf(stderr, "ERROR: Invalid GPIO pin name \"%s\"..\n", optarg);
-	  return -1;
-	}
-	gpioLED = libsoc_gpio_request(pin, LS_SHARED);
-	if (gpioLED == NULL) {
-	  fprintf(stderr, "ERROR: Unable to get pin \"%s\" (aka #%d).\n", optarg, pin);
-	  return -1;
-	}
+      gpioLED = libSOC::gpio::get(optarg);
+      if (gpioLED == NULL) {
+	fprintf(stderr, "ERROR: Unable to get pin \"%s\".\n", optarg);
+	return -1;
       }
       break;
       
@@ -106,20 +92,18 @@ main(int argc, char *argv[])
   }
   
   // Set direction to OUTPUT, and initialize to LOW
-  libsoc_gpio_set_direction(gpioLED, OUTPUT);
-  libsoc_gpio_set_level(gpioLED, LOW);
+  gpioLED->makeOutput();
+  gpioLED->setValue(1);
 
   // Blink the LED at 1Hz for 5 secs
   int i;
   for (i = 0; i < 5; i++) {
     usleep(500000);
-    libsoc_gpio_set_level(gpioLED, HIGH);
+    gpioLED->setValue(1);
     usleep(500000);
-    libsoc_gpio_set_level(gpioLED, LOW);
+    gpioLED->setValue(0);
+    
   }
-  
-  libsoc_gpio_free(gpioLED);
-  libsoc_board_free(board);
-  
+
   return 0;
 }

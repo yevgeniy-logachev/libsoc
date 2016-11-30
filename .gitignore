@@ -27,6 +27,7 @@ libsoc.pc
 *.la
 *.lo
 *.o
+*.a
 *.pyc
 *.swp
 *~
