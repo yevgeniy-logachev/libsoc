@@ -639,12 +639,12 @@ gfx::drawChar(uint8_t c,
 int
 main(int argc, const char* argv[])
 {
-  libSOC::SSD1306 drv(libSOC::gpio::get("CSID4"),     // CLK
-		      libSOC::gpio::get("CSID6"),  // DIN
-		      libSOC::gpio::get("CSID1"),     // D/C
-		      libSOC::gpio::get("CSID2"),    // CS
-		      libSOC::gpio::get("CSID0"),
-                      64);    // RST
+  libSOC::SSD1306 drv(libSOC::gpio::get("LCD-D20"),     // CLK
+		      libSOC::gpio::get("LCD-D18"),  // DIN
+		      libSOC::gpio::get("LCD-D22"),     // D/C
+		      libSOC::gpio::get("LCD-VSYNC"),    // CS
+		      libSOC::gpio::get("LCD-CLK"), // Rst
+                      64);
 
   printf("Starting Test...\n");
 
@@ -657,6 +657,8 @@ main(int argc, const char* argv[])
 
   int max = (X > Y) ? X : Y;
 
+  fx.refreshScreen();
+  sleep(1);
   fx.clearScreen();
 
   // Draw a 'X' across the display
