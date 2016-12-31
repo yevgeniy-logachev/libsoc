@@ -74,7 +74,7 @@ libSOC::gpio::makeOutput()
 bool
 libSOC::gpio::makeInput()
 {
-  return (libsoc_gpio_set_direction(m_imp, OUTPUT) == EXIT_SUCCESS);
+  return (libsoc_gpio_set_direction(m_imp, INPUT) == EXIT_SUCCESS);
 }
 
 

@@ -28,8 +28,8 @@ All text above, and the splash screen must be included in any redistribution
 #include <stdint.h>
 
 #include "rgbDriver.hh"
-#include "gpio.hh"
-#include "spi.hh"
+#include "libsoc/gpio.hh"
+#include "libsoc/spi.hh"
 
 namespace libSOC {
 
