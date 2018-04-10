@@ -10,8 +10,9 @@ int file_open(const char *path, int flags)
 
   if (fd < 0)
   {
+    fprintf(stderr, "Unable to open \"%s\": ", path);
     perror("libsoc-file-debug");
-    return -1;
+    exit(-1);
   }
 
   return fd;

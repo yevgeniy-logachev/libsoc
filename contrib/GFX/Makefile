@@ -20,7 +20,7 @@
 INSTALLDIR = /usr/local
 
 CC	= gcc
-CFLAGS	= -I ../../lib++/include
+CFLAGS	= -I ../../lib++/include -I ../../lib/include
 
 SRCS	= $(wildcard *.cc)
 OBJS	= $(patsubst %.cc,%.o,$(SRCS))
@@ -29,7 +29,7 @@ OBJS	= $(patsubst %.cc,%.o,$(SRCS))
 all: libsocGFX.a
 
 test: libsocGFX.a
-	$(CC) $(CFLAGS) -o test -DTEST gfx.cc libsocGFX.a \
+	$(CC) $(CFLAGS) -o test -DTEST -DI2C gfx.cc libsocGFX.a \
 		$(INSTALLDIR)/lib/libsoc++.a $(INSTALLDIR)/lib/libsoc.a -lstdc++ -l pthread
 
 libsocGFX.a: $(OBJS)

@@ -58,7 +58,10 @@ libSOC::gpio::get(const char* name)
   }
 
   int pin = libsoc_board_gpio_id(g_board, name);
-  if (pin < 0) return NULL;
+  if (pin < 0) {
+    fprintf(stderr, "ERROR: GPIO pin \"%s\" unknown.\n", name);
+    return NULL;
+  }
 
   return get((unsigned int) pin);
 }

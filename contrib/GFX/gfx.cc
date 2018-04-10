@@ -634,16 +634,13 @@ gfx::drawChar(uint8_t c,
 #include <stdio.h>
 #include <unistd.h>
 
-#include "SSD1306.hh"
+#include "SH1106.hh"
 
 int
 main(int argc, const char* argv[])
 {
-  libSOC::SSD1306 drv(libSOC::gpio::get("LCD-D20"),     // CLK
-		      libSOC::gpio::get("LCD-D18"),  // DIN
-		      libSOC::gpio::get("LCD-D22"),     // D/C
-		      libSOC::gpio::get("LCD-VSYNC"),    // CS
-		      libSOC::gpio::get("LCD-CLK"), // Rst
+  libSOC::SH1106 drv(NULL, // I2C
+		      NULL, // Rst
                       64);
 
   printf("Starting Test...\n");

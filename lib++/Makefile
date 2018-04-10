@@ -19,7 +19,7 @@
 
 INSTALLDIR = /usr/local
 
-CC	= gcc
+CC	= gcc -g
 CFLAGS	= -Iinclude -I ../lib/include
 
 SRCS	= $(wildcard *.cc)
