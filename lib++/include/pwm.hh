@@ -54,10 +54,10 @@ namespace libSOC {
     /**
      * \brief Set the period
      * \param period in ns
-     * \param dutyCycle in percent
+     * \param dutyCycle in ns
      * \return true if is input
      */
-    bool setPulse(unsigned int period, unsigned char percent);
+    bool setPulse(unsigned int period, unsigned int duty);
 
 
   private:

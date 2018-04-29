@@ -49,8 +49,10 @@ libSOC::pwm::get(unsigned int chip, unsigned int num, bool invert)
     p->mPeriod = 0;
 
     int rc = EXIT_SUCCESS;
+    /* Not supported in Raspberry Pi?
     if (p->mInvert) rc = libsoc_pwm_set_polarity((::pwm*) p->mImp, INVERSED);
     else rc = libsoc_pwm_set_polarity((::pwm*) p->mImp, NORMAL);
+    */
     if (rc == EXIT_FAILURE) {
       libsoc_pwm_free((::pwm*) p->mImp);
       return NULL;
@@ -90,17 +92,18 @@ libSOC::pwm::disable()
 
 
 bool
-libSOC::pwm::setPulse(unsigned int period, unsigned char percent)
+libSOC::pwm::setPulse(unsigned int period, unsigned int duty)
 {
-  if (percent > 100) percent = 100;
+  if (duty > period) duty = period;
 
+  fprintf(stderr, "T=%d, DC=%d\n", period, duty);
   if (period > mPeriod) {
     // Slowing down... set period first as duty cycle is safe
     if (libsoc_pwm_set_period((::pwm*) mImp, period) == EXIT_FAILURE) return false;
-    if (libsoc_pwm_set_duty_cycle((::pwm*) mImp, period * percent / 100) == EXIT_FAILURE) return false;
+    if (libsoc_pwm_set_duty_cycle((::pwm*) mImp, duty) == EXIT_FAILURE) return false;
   } else {
     // Speeding up... set duty cycle first to keep it safe
-    if (libsoc_pwm_set_duty_cycle((::pwm*) mImp, period * percent / 100) == EXIT_FAILURE) return false;
+    if (libsoc_pwm_set_duty_cycle((::pwm*) mImp, duty) == EXIT_FAILURE) return false;
     if (libsoc_pwm_set_period((::pwm*) mImp, period) == EXIT_FAILURE) return false;
   }
 

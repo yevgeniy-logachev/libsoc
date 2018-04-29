@@ -28,7 +28,11 @@ OBJS	= $(patsubst %.cc,%.o,$(SRCS))
 
 all: libsocGFX.a
 
-test: libsocGFX.a
+test-drv: libsocGFX.a
+	$(CC) $(CFLAGS) -o test -DTEST -DI2C SH1106.cc libsocGFX.a \
+		$(INSTALLDIR)/lib/libsoc++.a $(INSTALLDIR)/lib/libsoc.a -lstdc++ -l pthread
+
+test-gfx: libsocGFX.a
 	$(CC) $(CFLAGS) -o test -DTEST -DI2C gfx.cc libsocGFX.a \
 		$(INSTALLDIR)/lib/libsoc++.a $(INSTALLDIR)/lib/libsoc.a -lstdc++ -l pthread
 

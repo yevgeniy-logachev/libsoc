@@ -72,6 +72,9 @@ namespace libSOC {
       
       /* Get the color of a pixel */
       virtual rgb_t getPixel(int16_t x, int16_t y) = 0;
+
+      /* Dump the content of the video memory */
+      virtual bool saveScreen(const char* fname) = 0;
     };
     
   }

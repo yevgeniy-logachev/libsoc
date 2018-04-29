@@ -418,6 +418,29 @@ SSD1306::SPIwrite(uint8_t d)
 }
 
 
+bool
+SSD1306::saveScreen(const char* fname)
+{
+  FILE *fp = fopen(fname, "w");
+  if (fp == NULL) {
+    fprintf(stderr, "ERROR: Cannot save screen to file \"%s\": ", fname);
+    perror(0);
+    return false;
+  }
+
+  fprintf(fp, "static uint8_t buffer[SSD1306::WIDTH * SSD1306::HEIGHT / 8] = {\n");
+  for (int i = 0; i < sizeof(buffer); i++) {
+    if (i % 16 == 0) fprintf(fp, "   ");
+    fprintf(fp, "0x%02x, ", buffer[i]);
+    if (i % 16 == 15) fprintf(fp, "\n");
+  }
+  fprintf(fp, "};\n");
+  fclose(fp);
+
+  return true;
+}
+
+
 #ifdef TEST
 
 #include <libsoc/debug.hh>

@@ -40,7 +40,7 @@ namespace libSOC {
 
     SH1106(i2c* i2cDev, gpio* rst, unsigned char height = 32);
 
-    void begin();
+    void begin(uint8_t *splash = NULL);
   
     void command(uint8_t c);
     void data(uint8_t c);
@@ -66,6 +66,8 @@ namespace libSOC {
     /* Get the color of a pixel */
     virtual RGB::rgb_t getPixel(int16_t x, int16_t y);
 
+    virtual bool saveScreen(const char* fname);
+    
   private:
     unsigned char m_height;
     i2c*  m_i2c;

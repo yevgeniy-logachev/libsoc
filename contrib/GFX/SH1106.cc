@@ -286,7 +286,7 @@ SH1106::getPixel(int16_t x, int16_t y)
 }
 
 void
-SH1106::begin()
+SH1106::begin(uint8_t *splash)
 {
   reset();
 
@@ -328,7 +328,12 @@ SH1106::begin()
   command(SH1106_DISPLAYALLON_RESUME);           // 0xA4
   command(SH1106_DISPLAYON);//--turn on oled panel
 
-  // Refresh the screen (will display the AFI logo)
+  // Use the AdaFruit splash screen by default
+  if (splash != NULL) {
+    memcpy(buffer, splash, sizeof(buffer));
+  }
+  
+  // Refresh the screen (will display the splash screen)
   updateBoundingBox(0, 0, getWidth()-1, m_height-1);
   refresh();
 }
@@ -345,6 +350,29 @@ SH1106::data(uint8_t c)
 {
   i2c_smbus_write_byte_data(m_fd, 0x40, c);
 }
+
+bool
+SH1106::saveScreen(const char* fname)
+{
+  FILE *fp = fopen(fname, "w");
+  if (fp == NULL) {
+    fprintf(stderr, "ERROR: Cannot save screen to file \"%s\": ", fname);
+    perror(0);
+    return false;
+  }
+
+  fprintf(fp, "static uint8_t buffer[SH1106::WIDTH * SH1106::HEIGHT / 8] = {\n");
+  for (int i = 0; i < sizeof(buffer); i++) {
+    if (i % 16 == 0) fprintf(fp, "   ");
+    fprintf(fp, "0x%02x, ", buffer[i]);
+    if (i % 16 == 15) fprintf(fp, "\n");
+  }
+  fprintf(fp, "};\n");
+  fclose(fp);
+
+  return true;
+}
+
 
 #ifdef TEST
 

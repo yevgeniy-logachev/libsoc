@@ -68,6 +68,8 @@ namespace libSOC {
     /* Get the color of a pixel */
     virtual RGB::rgb_t getPixel(int16_t x, int16_t y);
 
+    virtual bool saveScreen(const char* fname);
+
   private:
     unsigned char m_height;
     spi*  m_spi;
