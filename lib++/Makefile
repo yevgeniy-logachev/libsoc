@@ -20,7 +20,7 @@
 INSTALLDIR = /usr/local
 
 CC	= gcc -g
-CFLAGS	= -Iinclude -I ../lib/include
+CFLAGS	= -Iinclude -I../lib/include -I../../libgpiod/include
 
 SRCS	= $(wildcard *.cc)
 OBJS	= $(patsubst %.cc,%.o,$(SRCS))

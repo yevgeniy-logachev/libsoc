@@ -34,7 +34,7 @@ static std::map<uint64_t, spi*> m_singletons;
 
 static unsigned int mapIndex(uint32_t spiNum, uint32_t csNum)
 {
-  return ((uint64_t) csNum) << 32 + spiNum;
+  return (((uint64_t) csNum) << 32) + spiNum;
 }
 
 

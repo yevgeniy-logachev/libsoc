@@ -28,6 +28,8 @@ namespace libSOC {
   class gpio
   {
   public:
+    typedef enum {NO_PULL, PULL_UP, PULL_DN} inputMode_t;
+
     /**
      * Get the GPIO object singleton for the specified pin
      */
@@ -48,10 +50,10 @@ namespace libSOC {
 
 
     /**
-     * \brief set GPIO to input
+     * \brief set GPIO to input, with no pull, pull-up, or pull-down
      * \return TRUE on success
      */
-    bool makeInput();
+    bool makeInput(inputMode_t mode = NO_PULL);
 
 
     /**

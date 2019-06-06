@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2016 Janick Bergeron
+// Copyright (c) 2016-2019 Janick Bergeron
 // All Rights Reserved
 //
 //   Licensed under the Apache License, Version 2.0 (the
@@ -20,25 +20,40 @@
 
 #include "gpio.hh"
 
-
-#include "libsoc_gpio.h"
+#include "gpiod.h"
 #include "libsoc_board.h"
 
 #include <map>
 
+#include <errno.h>
+#include <stdio.h>
 
+
+static gpiod_chip*                                 g_chip = NULL;
 static std::map<unsigned int, libSOC::gpio*>  g_singletons;
-static board_config                          *g_board      = NULL;
+static board_config                               *g_board      = NULL;
 
 
 libSOC::gpio*
 libSOC::gpio::get(unsigned int pin)
 {
+  if (g_chip == NULL) {
+    const char* path = "/dev/gpiochip0";
+    g_chip = gpiod_chip_open(path);
+    if (g_chip == NULL) {
+      fprintf(stderr, "ERROR: Unable to open GPIO chip \"%s\": %s\n", path, strerror(errno));
+      return NULL;
+    }
+  }
+
   libSOC::gpio *p = g_singletons[pin];
 
   if (p == NULL) {
-    void *imp = libsoc_gpio_request(pin, LS_SHARED);
-    if (imp == NULL) return NULL;
+    struct gpiod_line *imp = gpiod_chip_get_line(g_chip, pin);
+    if (imp == NULL) {
+      fprintf(stderr, "ERROR: Unable to get GPIO pin %d: %s\n", pin, strerror(errno));
+      return NULL;
+    }
 
     p = new libSOC::gpio();
     p->m_imp = imp;
@@ -70,35 +85,43 @@ libSOC::gpio::get(const char* name)
 bool
 libSOC::gpio::makeOutput()
 {
-  return (libsoc_gpio_set_direction(m_imp, OUTPUT) == EXIT_SUCCESS);
+  struct gpiod_line_request_config cfg = {"libSOC++",
+					  GPIOD_LINE_REQUEST_DIRECTION_OUTPUT,
+					  0};
+
+  return gpiod_line_request((struct gpiod_line*) m_imp, &cfg, 0) == 0;
 }
 
 
 bool
-libSOC::gpio::makeInput()
+libSOC::gpio::makeInput(inputMode_t mode)
 {
-  return (libsoc_gpio_set_direction(m_imp, INPUT) == EXIT_SUCCESS);
+  struct gpiod_line_request_config cfg = {"libSOC++",
+					  GPIOD_LINE_REQUEST_DIRECTION_INPUT,
+					  (mode == PULL_UP) ? GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN : (mode == PULL_DN) ? GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE : 0};
+
+  return gpiod_line_request((struct gpiod_line*) m_imp, &cfg, 0) == 0;
 }
 
 
 bool
 libSOC::gpio::isInput()
 {
-  return (libsoc_gpio_get_direction(m_imp) == INPUT);
+  return gpiod_line_direction((struct gpiod_line*) m_imp) == GPIOD_LINE_REQUEST_DIRECTION_INPUT;
 }
 
 
 bool
 libSOC::gpio::setValue(bool val)
 {
-  return (libsoc_gpio_set_level(m_imp, (val) ? HIGH : LOW) == EXIT_SUCCESS);
+  return gpiod_line_set_value((struct gpiod_line*) m_imp, val) == 0;
 }
 
 
 bool
 libSOC::gpio::getValue()
 {
-  return (libsoc_gpio_get_level(m_imp) ==  HIGH);
+  return gpiod_line_get_value((struct gpiod_line*) m_imp);
 }
     
     
