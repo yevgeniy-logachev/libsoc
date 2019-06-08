@@ -80,6 +80,18 @@ libsoc_spi_init (uint32_t spidev_device, uint32_t chip_select)
       goto error;
     }
 
+  uint32_t mode = 0;
+  ioctl(spi_dev->fd, SPI_IOC_WR_MODE32, &mode);
+  ioctl(spi_dev->fd, SPI_IOC_RD_MODE32, &mode);
+
+  uint8_t bits = 8;
+  ioctl(spi_dev->fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
+  ioctl(spi_dev->fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
+
+  uint32_t speed = 1000;
+  ioctl(spi_dev->fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+  ioctl(spi_dev->fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
+  
   return spi_dev;
 
 error:

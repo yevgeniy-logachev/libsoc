@@ -20,13 +20,14 @@
 
 #include "gpio.hh"
 
-#include "gpiod.h"
+#include "linux/gpiod.h"
 #include "libsoc_board.h"
 
 #include <map>
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 
 static gpiod_chip*                                 g_chip = NULL;
@@ -98,7 +99,7 @@ libSOC::gpio::makeInput(inputMode_t mode)
 {
   struct gpiod_line_request_config cfg = {"libSOC++",
 					  GPIOD_LINE_REQUEST_DIRECTION_INPUT,
-					  (mode == PULL_UP) ? GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN : (mode == PULL_DN) ? GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE : 0};
+					  (mode == PULL_DN) ? GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN : (mode == PULL_UP) ? GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE : 0};
 
   return gpiod_line_request((struct gpiod_line*) m_imp, &cfg, 0) == 0;
 }
