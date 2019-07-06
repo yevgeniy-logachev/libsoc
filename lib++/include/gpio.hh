@@ -57,6 +57,14 @@ namespace libSOC {
 
 
     /**
+     * \brief set GPIO to interrupt with specified callback function
+     * \return TRUE on success
+     */
+      typedef enum {RISING = 1, FALLING = 2, BOTH = 3} edge_t;
+      bool makeInterrupt(void (*fct)(void*), void* arg, edge_t edge, inputMode_t mode = NO_PULL);
+
+
+    /**
      * \brief Check the direction of the GPIO
      * \return true if is input
      */

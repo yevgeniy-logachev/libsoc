@@ -24,6 +24,7 @@
 #include "libsoc_board.h"
 
 #include <map>
+#include <thread>
 
 #include <errno.h>
 #include <stdio.h>
@@ -102,6 +103,59 @@ libSOC::gpio::makeInput(inputMode_t mode)
 					  (mode == PULL_DN) ? GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN : (mode == PULL_UP) ? GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE : 0};
 
   return gpiod_line_request((struct gpiod_line*) m_imp, &cfg, 0) == 0;
+}
+
+
+typedef struc isrArgs_s {
+    libSOC::gpio*  gpio;
+    void          (*fct)(void*);
+    void*           arg;
+} isrArgs_t;
+
+static void*
+ISR(void* args)
+{
+    isrARgs_t *args = (isrArgs_t*) args;
+
+    struct timespec timeout;
+    struct gpio_line_event event;
+
+    bzero(&timeout, sizeof(timeout));
+
+    while (1) {
+        if (gpiod_line_event_wait((struct gpiod_line *) args->gpio->m_imp, &timeout) == 0) {
+            gpiod_line_event_read((struct gpiod_line *) args->gpio->m_imp, &event);
+
+            args->fct(args->arg);
+        }
+    }
+
+    return NULL;
+}
+
+
+bool
+libSOC::gpio::makeInterrupt(void (*fct)(void*), void* arg, libSOC::gpio::edge_t edge, inputMode_t mode)
+{
+  struct gpiod_line_request_config cfg = {"libSOC++",
+					  (edge == RISING) ? GPIOD_LINE_REQUEST_EVENT_RISING_EDGE
+                                                           : (edge == FALLING) ? GPIOD_LINE_REQUEST_EVENT_FALLING_EDGE
+                                                                               : GPIOD_LINE_REQUEST_EVENT_BOTH_EDGE,
+					  (mode == PULL_DN) ? GPIOD_LINE_REQUEST_FLAG_OPEN_DRAIN
+                                                            : (mode == PULL_UP) ? GPIOD_LINE_REQUEST_FLAG_OPEN_SOURCE
+                                                            : 0};
+
+  if (gpiod_line_request((struct gpiod_line*) m_imp, &cfg, 0)) return false;
+
+  isrArgs_t *args = new isrArgs_t;
+
+  args->gpio = this;
+  args->fct  = fct;
+  args->arg  = arg;
+
+  (void) new std::thread(ISR, args);
+
+  return true;
 }
 
 
