@@ -15,7 +15,7 @@
 static char pwm_polarity_strings[2][STR_BUF] = { "normal", "inversed" };
 static char pwm_enabled_strings[2][STR_BUF] = { "0", "1" };
 
-inline void libsoc_pwm_debug (const char *func, unsigned int chip,
+void libsoc_pwm_debug (const char *func, unsigned int chip,
   unsigned int pwm, char *format, ...)
 {
 #ifdef DEBUG
@@ -37,7 +37,7 @@ inline void libsoc_pwm_debug (const char *func, unsigned int chip,
 }
 
 pwm* libsoc_pwm_request (unsigned int chip, unsigned int pwm_num,
-  enum shared_mode mode)
+  shared_mode mode)
 {
   pwm *new_pwm;
   char tmp_str[STR_BUF];
@@ -313,7 +313,8 @@ int libsoc_pwm_set_polarity(pwm *pwm, pwm_polarity polarity)
 
   sprintf(path, "/sys/class/pwm/pwmchip%d/pwm%d/polarity", pwm->chip, pwm->pwm);
 
-  return file_write_str(path, pwm_polarity_strings[polarity], STR_BUF);
+  int rc = file_write_str(path, pwm_polarity_strings[polarity], strlen(pwm_polarity_strings[polarity]));
+  return rc;
 }
 
 int libsoc_pwm_get_polarity(pwm *pwm)

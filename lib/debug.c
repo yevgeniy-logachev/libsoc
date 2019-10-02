@@ -3,7 +3,7 @@
 
 int debug = 0;
 
-inline void
+void
 libsoc_debug (const char *func, char *format, ...)
 {
 #ifdef DEBUG
@@ -25,12 +25,26 @@ libsoc_debug (const char *func, char *format, ...)
 #endif
 }
 
-inline void
+void
 libsoc_warn (const char *format, ...)
 {
   va_list args;
 
   fprintf (stderr, "libsoc-warn: ");
+
+  va_start (args, format);
+  vfprintf (stderr, format, args);
+  va_end (args);
+
+  fprintf (stderr, "\n");
+}
+
+void
+libsoc_error (const char* func, const char *format, ...)
+{
+  va_list args;
+
+  fprintf (stderr, "libsoc-error: %s: ", func);
 
   va_start (args, format);
   vfprintf (stderr, format, args);

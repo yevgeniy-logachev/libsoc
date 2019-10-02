@@ -6,13 +6,14 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/types.h>
+#include <linux/ioctl.h>
 #include <linux/spi/spidev.h>
 
 #include "libsoc_spi.h"
 #include "libsoc_debug.h"
 #include "libsoc_file.h"
 
-inline void
+void
 libsoc_spi_debug (const char *func, spi * spi, char *format, ...)
 {
 #ifdef DEBUG
@@ -43,7 +44,7 @@ libsoc_spi_debug (const char *func, spi * spi, char *format, ...)
 }
 
 spi *
-libsoc_spi_init (uint8_t spidev_device, uint8_t chip_select)
+libsoc_spi_init (uint32_t spidev_device, uint32_t chip_select)
 {
   spi *spi_dev;
 
@@ -79,6 +80,18 @@ libsoc_spi_init (uint8_t spidev_device, uint8_t chip_select)
       goto error;
     }
 
+  uint32_t mode = 0;
+  ioctl(spi_dev->fd, SPI_IOC_WR_MODE32, &mode);
+  ioctl(spi_dev->fd, SPI_IOC_RD_MODE32, &mode);
+
+  uint8_t bits = 8;
+  ioctl(spi_dev->fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
+  ioctl(spi_dev->fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
+
+  uint32_t speed = 1000;
+  ioctl(spi_dev->fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+  ioctl(spi_dev->fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
+  
   return spi_dev;
 
 error:
@@ -222,7 +235,7 @@ libsoc_spi_get_mode (spi * spi)
   if (spi == NULL)
     {
       libsoc_spi_debug (__func__, NULL, "spi was not valid");
-      return EXIT_FAILURE;
+      return MODE_ERROR;
     }
 
   int ret = ioctl (spi->fd, SPI_IOC_RD_MODE, &mode);
@@ -275,7 +288,11 @@ libsoc_spi_write (spi * spi, uint8_t * tx, uint32_t len)
 
   struct spi_ioc_transfer tr = {
     .tx_buf = (unsigned long) tx,
+    .rx_buf = 0,
     .len = len,
+    .delay_usecs = 0,
+    .speed_hz = 1000,
+    .bits_per_word = 8,
   };
 
   ret = ioctl (spi->fd, SPI_IOC_MESSAGE (1), &tr);

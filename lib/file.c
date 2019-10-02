@@ -2,21 +2,23 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/stat.h>
 
-inline int file_open(const char *path, int flags)
+int file_open(const char *path, int flags)
 {
   int fd = open(path, flags);
 
   if (fd < 0)
   {
+    fprintf(stderr, "Unable to open \"%s\": ", path);
     perror("libsoc-file-debug");
-    return -1;
+    exit(-1);
   }
 
   return fd;
 }
 
-inline int file_write(int fd, const char *str, int len)
+int file_write(int fd, const char *str, int len)
 {
   int ret_len = write(fd, str, len);
 
@@ -29,10 +31,9 @@ inline int file_write(int fd, const char *str, int len)
   return ret_len;
 }
 
-inline int file_read(int fd, void *buf, int count)
+int file_read(int fd, void *buf, int count)
 {
   lseek (fd, 0, SEEK_SET);
-
   int ret = read(fd, buf, count);
 
   if (ret < 0)
@@ -44,7 +45,7 @@ inline int file_read(int fd, void *buf, int count)
   return ret;
 }
 
-inline int file_valid(char *path)
+int file_valid(char *path)
 {
   if (access(path, F_OK) == 0)
   {
@@ -54,7 +55,7 @@ inline int file_valid(char *path)
   return 0;
 }
 
-inline int file_close(int fd)
+int file_close(int fd)
 {
   if (close(fd) < 0)
   {
@@ -67,7 +68,21 @@ inline int file_close(int fd)
 
 #define INT_STR_BUF 20
 
-inline int file_read_int_path(char *path, int *tmp)
+int file_read_int_fd(int fd, int *tmp)
+{
+  char buf[INT_STR_BUF];
+
+  if (file_read(fd, buf, INT_STR_BUF) < 0)
+  {
+    return EXIT_FAILURE;
+  }
+
+  *tmp = atoi(buf);
+
+  return EXIT_SUCCESS;
+}
+
+int file_read_int_path(char *path, int *tmp)
 {
   int fd, ret;
 
@@ -88,21 +103,21 @@ inline int file_read_int_path(char *path, int *tmp)
   return EXIT_SUCCESS;
 }
 
-inline int file_read_int_fd(int fd, int *tmp)
+int file_write_int_fd(int fd, int val)
 {
   char buf[INT_STR_BUF];
 
-  if (file_read(fd, buf, INT_STR_BUF) < 0)
+  sprintf(buf, "%d", val);
+
+  if (file_write(fd, buf, INT_STR_BUF) < 0)
   {
     return EXIT_FAILURE;
   }
 
-  *tmp = atoi(buf);
-
   return EXIT_SUCCESS;
 }
 
-inline int file_write_int_path(char *path, int val)
+int file_write_int_path(char *path, int val)
 {
   int fd, ret;
 
@@ -123,21 +138,7 @@ inline int file_write_int_path(char *path, int val)
   return EXIT_SUCCESS;
 }
 
-inline int file_write_int_fd(int fd, int val)
-{
-  char buf[INT_STR_BUF];
-
-  sprintf(buf, "%d", val);
-
-  if (file_write(fd, buf, INT_STR_BUF) < 0)
-  {
-    return EXIT_FAILURE;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-inline int file_read_str(char *path, char *tmp, int buf_len)
+int file_read_str(char *path, char *tmp, int buf_len)
 {
   int fd;
 
@@ -161,7 +162,7 @@ inline int file_read_str(char *path, char *tmp, int buf_len)
   return EXIT_SUCCESS;
 }
 
-inline int file_write_str(char *path, char* buf, int len)
+int file_write_str(char *path, char* buf, int len)
 {
   int fd;
 
@@ -185,3 +186,30 @@ inline int file_write_str(char *path, char* buf, int len)
   return EXIT_SUCCESS;
 }
 
+char* file_read_contents(const char *path)
+{
+  int fd;
+  struct stat st;
+  char *buf;
+
+  if (stat(path, &st))
+  {
+    perror("libsoc-file-debug");
+    return NULL;
+  }
+
+  fd = file_open(path, O_RDONLY);
+  if (fd < 0)
+    return NULL;
+
+  buf = malloc(st.st_size);
+  if (buf)
+  {
+    if (file_read(fd, buf, st.st_size) != st.st_size)
+    {
+      free(buf);
+      return NULL;
+    }
+  }
+  return buf;
+}

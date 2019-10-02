@@ -6,18 +6,16 @@
 #include "libsoc_gpio.h"
 #include "libsoc_debug.h"
 
-/**
- * 
- * This gpio_test is intended to be run on beaglebone white hardware
- * and uses pins P9_42(gpio7) and P9_27 (gpio115) connected together.
- *
+
+/*
  * The GPIO_OUTPUT and INPUT defines can be changed to support any board
  * all you need to do is ensure that the two pins are connected together
- * 
- */
- 
- #define GPIO_OUTPUT  115
- #define GPIO_INPUT   7
+ *
+ */ 
+
+#define GPIO_OUTPUT  8
+#define GPIO_INPUT   9
+
 
 static int interrupt_count = 0;
 
@@ -187,7 +185,7 @@ int main(void)
   // Wait 10 seconds for falling interrupt to occur on GPIO_INPUT
   int ret = libsoc_gpio_wait_interrupt(gpio_input, 10000);
   
-  if (ret == EXIT_SUCCESS)
+  if (ret == LS_INT_TRIGGERED)
   {
     printf("Interrupt caught!\n");
   }

@@ -1,46 +1,27 @@
 #ifndef _LIBSOC_GPIO_H_
 #define _LIBSOC_GPIO_H_
 
-#include <pthread.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * \struct gpio_callback
- * \brief representation of an interrupt callback
- * \param int (*callback_fn)(void*) - the function to callback on interrupt
- * \param void *callback_arg - the argument to pass to the callback function
- * \param pthread_t *thread - the pthread struct on which the poll and
- *  callback function runs
- * \param int ready - signal when the pthread is ready to accept interrupts
+ * Opaque GPIO descriptor
  */
-
-struct gpio_callback {
-	int (*callback_fn) (void *);
-	void *callback_arg;
-	pthread_t *thread;
-	int ready;
-};
-
+typedef void gpio;
+  
 /**
- * \struct gpio
- * \brief representation of a single requested gpio
- * \param unsigned int gpio gpio id
- * \param int value_fd file descriptor to gpio value file
- * \param struct gpio_callback *callback - struct used to store interrupt
- *  callback data
- * \param int shared - set if the request flag was shared and the GPIO was
- *  exported on request
+ * \enum gpio_int_ret
+ * \brief defined values for return type of blocked gpio interrupts
  */
 
-typedef struct {
-	unsigned int gpio;
-	int value_fd;
-	struct gpio_callback *callback;
-	int shared;
-} gpio;
+typedef enum {
+	LS_INT_ERROR = EXIT_FAILURE,
+	LS_INT_TRIGGERED = EXIT_SUCCESS,
+	LS_INT_TIMEOUT,
+} gpio_int_ret;
 
 /**
  * \enum gpio_direction
@@ -91,11 +72,11 @@ typedef enum {
  *             on free.
  */
 
-enum gpio_mode {
+typedef enum gpio_mode {
 	LS_SHARED,
 	LS_GREEDY,
 	LS_WEAK,
-};
+} gpio_mode;
 
 /**
  * \fn gpio* libsoc_gpio_request(unsigned int gpio_id)
@@ -154,15 +135,6 @@ int libsoc_gpio_set_level(gpio * current_gpio, gpio_level level);
  */
 
 gpio_level libsoc_gpio_get_level(gpio * current_gpio);
-
-/**
- * \fn void libsoc_gpio_set_debug 
- * \brief sets the debug level of the gpio functions, library must have 
- *  been compiled with DEBUG support enabled
- * \param int level - 1 or 0, 1 to enable debug 0 to disable
- */
-
-void libsoc_gpio_set_debug(int level);
 
 /**
  * \fn gpio_edge libsoc_gpio_get_edge(gpio* current_gpio)
